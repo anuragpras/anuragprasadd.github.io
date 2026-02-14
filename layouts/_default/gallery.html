@@ -1,0 +1,219 @@
+{{ define "main" }}
+
+<style>
+    :root {
+        --primary-color: #000;
+        --secondary-color: #fff;
+        --bg-color: #000;
+        --text-color: #fff;
+        --border-color: #262626;
+        --footer-text-color: #666;
+    }
+
+    .gallery-page-container {
+        font-family: 'Encode Sans', 'Arial', sans-serif;
+        font-weight: 800;
+        line-height: 1.6;
+        font-size: 16px;
+        max-width: 935px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .gallery-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .gallery-header .logo {
+        font-size: 2rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .gallery-header .logo small {
+        font-size: 0.75rem;
+        margin-left: 10px;
+        font-weight: 800;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+    }
+
+    .gallery-item {
+        position: relative;
+        width: 100%;
+        padding-top: 100%;
+        overflow: hidden;
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+    .gallery-item img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.05);
+    }
+
+    .gallery-modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gallery-modal-content {
+        display: block;
+        max-width: 90%;
+        max-height: 90%;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+        object-fit: contain;
+    }
+
+    @keyframes zoom {
+        from {
+            transform: scale(0)
+        }
+
+        to {
+            transform: scale(1)
+        }
+    }
+
+    .gallery-close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        z-index: 2001;
+        cursor: pointer;
+    }
+
+    .gallery-prev,
+    .gallery-next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        padding: 16px;
+        margin-top: -50px;
+        color: white;
+        font-weight: bold;
+        font-size: 40px;
+        transition: 0.3s;
+        border-radius: 0 3px 3px 0;
+        user-select: none;
+        z-index: 2001;
+    }
+
+    .gallery-next {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .gallery-prev {
+        left: 0;
+        border-radius: 3px 0 0 3px;
+    }
+
+    @media (max-width: 600px) {
+        .gallery-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+        }
+    }
+</style>
+
+<!-- Load Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+<div class="gallery-page-container">
+    <div class="gallery-header">
+        <div class="logo">⛺<small>stills by अनुराग</small></div>
+    </div>
+
+    <div class="gallery-grid" id="gallery-container">
+        {{- $files := readDir "static/gallery/images" -}}
+        {{- $imgCount := 0 -}}
+        {{- range $file := (sort $files "Name" "desc") -}}
+        {{- $name := lower .Name -}}
+        {{- if (findRE `\.(jpg|jpeg|png|webp)$` $name) -}}
+        <div class="gallery-item" data-index="{{ $imgCount }}">
+            <img src="/gallery/images/{{ .Name }}" alt="Gallery Image" loading="lazy">
+        </div>
+        {{- $imgCount = add $imgCount 1 -}}
+        {{- end -}}
+        {{- end -}}
+    </div>
+</div>
+
+<div id="imageModal" class="gallery-modal">
+    <span class="gallery-close">&times;</span>
+    <a class="gallery-prev">&#10094;</a>
+    <a class="gallery-next">&#10095;</a>
+    <img class="gallery-modal-content" id="modalImg">
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        const closeBtn = document.querySelector('.gallery-close');
+        const prevBtn = document.querySelector('.gallery-prev');
+        const nextBtn = document.querySelector('.gallery-next');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        let currentIndex = 0;
+
+        galleryItems.forEach((item, index) => {
+            item.onclick = () => {
+                currentIndex = index;
+                const img = item.querySelector('img');
+                modalImg.src = img.src;
+                modal.style.display = "flex";
+            };
+        });
+
+        function changeImage(n) {
+            currentIndex += n;
+            if (currentIndex >= galleryItems.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = galleryItems.length - 1;
+            modalImg.src = galleryItems[currentIndex].querySelector('img').src;
+        }
+
+        prevBtn.onclick = (e) => { e.stopPropagation(); changeImage(-1); };
+        nextBtn.onclick = (e) => { e.stopPropagation(); changeImage(1); };
+        closeBtn.onclick = () => { modal.style.display = "none"; };
+        window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; };
+
+        document.onkeydown = (e) => {
+            if (modal.style.display === "flex") {
+                if (e.key === "ArrowLeft") changeImage(-1);
+                else if (e.key === "ArrowRight") changeImage(1);
+                else if (e.key === "Escape") modal.style.display = "none";
+            }
+        };
+    });
+</script>
+
+{{ end }}

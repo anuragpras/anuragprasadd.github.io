@@ -1,0 +1,337 @@
+/* Tell the hero how much space to leave for the footer */
+:root{
+  --footer-height: 40px;            /* adjust to your real footer height */
+  --hero-outer-pad: 6vh;   /* symmetric top/bottom padding for the whole hero */
+  --hero-gap: 0.9rem;      /* uniform gap between rows inside the hero */
+  /* mobile tuning knobs */
+  --mobile-avatar-size: 220px;
+  --mobile-icon-size: 28px;
+  --mobile-icon-gap: 14px;
+}
+
+
+/* .main doesn’t need to be flex if body isn’t flex */
+.main{
+  display: block;
+}
+
+
+
+
+/* Fallback for browsers without svh */
+@supports not (height: 1svh){
+  .main .profile{
+    min-height: calc(100vh - var(--footer-height));
+  }
+}
+
+/* =========================
+   Grid + core pieces
+   ========================= */
+.profile .profile_inner h1 {
+    font-size: 2.5rem;
+}
+
+.profile img {
+    border-radius: 50%;
+    border: 1px solid var(--tertiary);
+}
+
+.buttons {
+    flex-wrap: wrap;
+}
+
+.button {
+    background: var(--tertiary);
+    border-radius: 25px; /* pill style */
+    margin: 6px 12px 6px 0px;
+    padding: 10px;
+}
+
+.button-inner {
+    padding: 0 8px;
+}
+
+.button:hover {
+    background: var(--lightcolor);
+}
+
+/* =========================
+   Home hero (single-column)
+   ========================= */
+
+/* Center the whole hero block */
+.main .profile{
+  align-items:center;
+  justify-content:center;
+}
+
+/* Grid for the actual children */
+.profile .profile_inner{
+  display:grid;
+  grid-template-columns:1fr;
+  grid-template-areas:
+    "img"
+    "title"
+    "icons"
+    "bio"
+    "buttons";
+  justify-items:center;         /* centers image/title/icons/buttons as items */
+  row-gap:.6rem;
+  gap:10px;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+/* 1) Image */
+.profile .profile_inner > img{
+  grid-area:img;
+  display:block;
+  margin:0 auto .8rem;
+  border-radius:35%;
+  border:1px solid var(--tertiary);
+}
+
+/* 2) Title */
+.profile .profile_inner > .title{
+  grid-area:title;
+  display:inline-block;         /* shrink to content */
+  justify-self:center;          /* center the grid item itself */
+  text-align:center;
+  margin:0 0 .6rem;
+  text-wrap:balance;            /* nicer multi-line titles (modern browsers) */
+}
+
+/* 3) Social icons (centered under title) */
+.profile .profile_inner > .social-icons{
+  grid-area:icons;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:.5rem;
+  width:100%;
+  margin:.2rem 0 .6rem;
+}
+.profile .profile_inner > .social-icons a{ padding:0; }
+.profile .profile_inner > .social-icons a svg{
+  width:24px;                   /* tune icon size */
+  height:24px;
+}
+
+/* 4) Bio text — your site uses a <span>; keep .subtitle as fallback */
+.profile .profile_inner > span,
+.profile .profile_inner > .subtitle{
+  grid-area:bio;
+  display:block;
+  /* readable + balanced: centered container, justified text */
+  max-width:850px;              /* wider box so justification looks natural */
+  margin:0 auto 1.2rem;
+  text-align:justify;
+  text-justify:inter-word;
+  line-height:1.75;
+  color:var(--secondary);
+  font-weight:400;
+}
+
+/* 5) Buttons (centered) */
+.profile .profile_inner > .buttons{
+  grid-area:buttons;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:.5rem;
+  width:100%;
+  margin-top:0rem;
+}
+
+/* Title size (keep your tweak) */
+.profile .profile_inner h1{ font-size:2.5rem; }
+
+/* =========================
+   Responsive refinements
+   ========================= */
+
+/* Medium screens: slightly tighter text box, slightly larger icons */
+@media (max-width: 1024px){
+  .profile .profile_inner > span,
+  .profile .profile_inner > .subtitle{ max-width: 720px; }
+  .profile .profile_inner > .social-icons a svg{ width:20px; height:20px; }
+}
+
+/* Small tablets / large phones */
+@media (max-width: 768px){
+  .profile .profile_inner h1{
+    font-size:clamp(2.4rem,7.8vw,3.0rem);
+    line-height:1.1;
+    font-weight:700;
+    text-align:center;
+  }
+  .profile .profile_inner > img{ width:160px; height:160px; }
+  .profile .profile_inner > span,
+  .profile .profile_inner > .subtitle{ max-width: 640px; line-height:1.7; }
+}
+
+/* Phones */
+@media (max-width: 480px){
+  .profile .profile_inner h1{
+    font-size:clamp(2.5rem,8.5vw,2.9rem);
+    line-height:1.08;
+    font-weight:700;
+    text-align:center;
+    margin-top:.4rem;
+  }
+  .profile .profile_inner > img{
+    width:220px;
+    height:220px;
+    border-radius:35%;
+  }
+  .profile .profile_inner > .social-icons a svg{
+  width:24px;
+  height:24px;
+  stroke-width:1.8;
+}
+  .profile .profile_inner > span{
+    max-width: 90vw;
+    font-size: 1.02rem;   /* make bio a touch smaller than default */
+    line-height: 1.6;     /* slightly tighter than desktop */
+  }
+
+  .profile .buttons .button {
+    font-size: 0.95rem;      /* slightly smaller text */
+    padding: 0.55rem 0.9rem; /* less padding */
+    border-radius: 25px;     /*  pill-style */
+    margin: 4px 8px;         /* lighter spacing */
+  }
+}
+
+/* === Balanced vertical rhythm inside the hero === */
+.profile .profile_inner {
+  row-gap: 0.9rem;                     /* consistent spacing between items */
+}
+
+
+
+/* Tiny cushion under buttons for optical balance */
+.profile .profile_inner > .buttons {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+  font-size: 0.96em;
+}
+/* === Typing Animation Core === */
+
+/* Host becomes positioning context during typing */
+.bio-typing-host {
+  position: relative;
+}
+
+/* Ghost keeps final geometry (width/line breaks/paragraph margins) */
+.bio-ghost {
+  visibility: hidden;
+  opacity: 1; /* real content, invisible until fade-in */
+}
+
+/* Overlay sits on top and inherits all typography */
+.bio-overlay {
+  position: absolute;
+  inset: 0;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 260ms linear; /* fade opacity, not color */
+}
+
+/* Typed lines inside overlay */
+.bio-overlay .typed-line,
+.bio-overlay .typed-current {
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+}
+
+/* Gap between paragraphs — must match final p{margin-bottom} */
+.bio-overlay .typed-paragraph-gap {
+  display: block;
+  height: 1rem;  /* adjust if your real paragraph spacing differs */
+  margin: 0;
+  padding: 0;
+}
+
+/* Optional caret logic (if used) */
+#bio-typer {
+  display: block;
+  white-space: pre-wrap;
+  text-align: justify;
+  text-align-last: justify;
+}
+#bio-typer::after {
+  content: "";
+  display: inline-block;
+  width: 100%;
+}
+#bio-caret {
+  display: inline-block;
+  margin-left: 2px;
+  animation: bio-caret-blink 1s steps(1) infinite;
+}
+@keyframes bio-caret-blink {
+  50% { opacity: 0; }
+}
+
+/* === Final bio paragraph spacing (matches typing overlay) === */
+.profile .profile_inner > span p,
+.profile .profile_inner > .subtitle p {
+  margin: 0 0 1rem;  /* bottom-only spacing */
+  letter-spacing: 0.01em;
+}
+
+/* Last paragraph: no extra gap after */
+.profile .profile_inner > span p:last-child,
+.profile .profile_inner > .subtitle p:last-child {
+  margin-bottom: 0;
+}
+
+/* Typing overlay uses identical spacing */
+.bio-overlay .typed-paragraph-gap {
+  height: 1rem;
+}
+
+/* Center the hero exactly in the viewport (minus footer) */
+.main .profile{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* Use full height minus footer; don't mix padding into the calc */
+  min-height: calc(100svh - var(--footer-height));
+  padding-block: var(--hero-outer-pad);   /* keep the visual cushion, but */
+  box-sizing: border-box;                 /* ensure it doesn't break centering */
+}
+@supports not (height: 1svh){
+  .main .profile{ min-height: calc(100vh - var(--footer-height)); }
+}
+
+
+/* Stronger title hierarchy + lighter bio */
+.profile .profile_inner h1 {
+  font-size: 3.3rem;          /* was 2.5rem */
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+  color: var(--primary);
+}
+
+/* Apply to your actual span-based bio text */
+.profile .profile_inner > span {
+  font-size: 0.97rem;         /* slightly smaller than default */
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--secondary) 90%, black 10%);
+  font-weight: 300;
+  text-align: justify;
+  max-width: 800px;
+  margin: 0 auto 1.2rem;
+}
+
